@@ -23,8 +23,7 @@ public class Bag<Item> implements Iterable<Item>{
 	}
 	
 	public void add(Item data) {
-		if (first == null) first.data = data;
-		else first = new Node<Item>(data, first);
+		first = new Node<Item>(data, first);
 		n++;
 	}
 	
