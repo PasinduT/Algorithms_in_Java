@@ -1,40 +1,41 @@
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
 
-public class MST {
-	private MinPQ<Edge> pq;
+public class KruskalMST {
+	private Edge arr[];
 	private Queue<Edge> q;
 	private double weight;
-	private boolean marked[];
+	private int marked[];
 	
-	public MST(EdgeWeightedGraph g) {
-		pq = (MinPQ<Edge>) new MinPQ(g.V());
+	public KruskalMST(EdgeWeightedGraph g) {
+		arr = new Edge[g.E()];
 		weight = 0.0;
-		marked = new boolean[g.V()];
+		marked = new int[g.V()];
 		q = new LinkedList<Edge>();
 		for (int i = 0; i < g.V(); i++)
-			marked[i] = false;
+			marked[i] = i;
 		
-		visit(g, 0);
-		while(!pq.isEmpty()) {
-			Edge e = pq.delMin();
-			int v = e.either();
+		int i = 0;
+		for (Edge e : g.edges())
+			arr[i++] = e;
+		
+		Arrays.sort(arr);
+		for (Edge e : arr) {
+			int v =  e.either();
 			int w = e.other(v);
-			if (marked[v] && marked[w]) continue;
+			if(root(marked[v]) == root(marked[w])) continue;
 			q.add(e);
 			weight += e.weight();
-			if (!marked[v]) visit(g, v);
-			if (!marked[w]) visit(g, w);
+			marked[root(v)] = root(w);
 		}
 		
 	}
-	
-	private void visit(EdgeWeightedGraph g, int v) {
-		marked[v] = true;
-		for(Edge a : g.adj(v)) {
-			pq.insert(a);
-		}
+	private int root(int v) {
+		while(v != marked[v])
+			v = marked[v];
+		return v;
 	}
 	
 	public Iterable<Edge> edges(){
@@ -63,7 +64,7 @@ public class MST {
 			g.addEdge(e);
 		}
 		
-		MST mst = new MST(g);
+		KruskalMST mst = new KruskalMST(g);
 		Iterable<Edge> q = mst.edges();
 		for(Edge e : q) {
 			System.out.println(e.toString());
